@@ -1,0 +1,79 @@
+def getDistance(item):          ##Find the number of overlapping letters between item and the target word
+    distance=0
+    for i in range(len(item)):
+        if(item[i]==goal[i]):
+            distance+=1
+    return distance
+
+def find(current):              ##Recursive algorithm to find the path of the traversal from the first word to the target
+    if(current==goal):          ##Base case
+        return path
+    else:
+        next = []
+        for word in words:
+            count = 0
+            distance = 0
+            for i in range(len(current)):
+                if(current[i]==word[i]):
+                    count+=1
+            if count==len(search)-1:        ##If words of same length as current word has -1 similar letter, add to the list of next words to search from
+                next.append(word)
+
+        if goal in next:                    ##If the target word exists in the list of next words solution found
+            path.append(goal)
+            return find(goal)
+        lowernone = True
+        for word in next:                               ##Try all words that are closer to the target word
+            if getDistance(word)>getDistance(current):
+                if not word in tried:
+                    current = word
+                    tried.append(word)
+                    path.append(word)
+                    return find(current)
+                    path.remove(word)
+
+
+        for word in next:                               ##Try all words that are the same distance as the target word to find something that then find a word that is closer
+            if getDistance(word)==getDistance(current):
+                if not word in tried:
+                    current = word
+                    tried.append(word)
+                    path.append(word)
+                    return find(current)
+                    path.remove(word)
+
+##Initialize Variables
+file = open('words.txt')
+words = []
+tried = []
+path = []
+cont = True
+
+
+## Read the first line
+while cont:
+    dict = file.readlines()
+    search = input("Please input the initial word: ")
+    for word in dict:
+        word = word.rstrip()
+        if(len(search)==len(word)):         ##Find words of the same length
+            words.append(word)
+
+    if not search in words:                                                                 ##Error testing if search word not in word collection or not word at all
+        print("Initial word not in list. Try another.")
+    goal = input("Please input goal word: ")
+    if(len(search)!=len(goal)):                                                             ##Error testing if search word and target word not same length
+        print("First word and target word lengths are not the same. Try again.")
+    if not goal in words:                                                                   ##Error testing if target word not in word collection or not word at all
+        print("Target word not in list, try another word.")
+    else:
+        tried.append(search)                        ##Carries out main function to find path of traversal
+        path.append(search)
+        solution=[]
+        solution = find(search)
+        cont = False
+        if not solution:
+            print("Solution not found")
+        else:
+            print(solution)
+file.close()
